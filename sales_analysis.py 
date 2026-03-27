@@ -60,15 +60,15 @@ plt.show()
 # 5. СОХРАНЯЕМ РЕЗУЛЬТАТЫ
 result_df = pd.DataFrame(list(city_revenue.items()), columns=["Город", "Выручка"])
 result_df = result_df.sort_values("Выручка", ascending=False)
-result_df.to_csv("itog_vyruchka.csv", index=False)
-print("✅ Итоговая таблица сохранена как itog_vyruchka.csv")
+result_df.to_parquet("itog_vyruchka.parquet", index=False)
+print("✅ Итоговая таблица сохранена как itog_vyruchka.parquet")
 
 # 6. СКАЧИВАЕМ ФАЙЛЫ
 print("\n📥 Скачиваю файлы...")
-files.download("itog_vyruchka.csv")
+files.download("itog_vyruchka.parquet")
 files.download("vyruchka_po_gorodam.png")
 
 print("\n🎉 ГОТОВО!")
 print("📁 У тебя на компьютере теперь:")
-print("   - itog_vyruchka.csv (таблица с выручкой)")
+print("   - itog_vyruchka.parquet (таблица с выручкой)")
 print("   - vyruchka_po_gorodam.png (график)")
