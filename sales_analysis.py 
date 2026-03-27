@@ -1,0 +1,74 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+from google.colab import files
+plt.style.use('dark_background')
+
+# 1. СОЗДАЁМ ПРИМЕР БОЛЬШОГО ФАЙЛА
+print("Создаю пример большого файла...")
+data = []
+for i in range(50000):
+    data.append({
+        "город": ["Минск", "Гомель", "Брест", "Витебск", "Гродно"][i % 5],
+        "товар": ["кофе", "чай", "сок", "молоко"][i % 4],
+        "количество": (i % 10) + 1,
+        "цена": (i % 50) + 10
+    })
+
+df_big = pd.DataFrame(data)
+df_big.to_csv("sales_big.csv", index=False)
+print("Файл sales_big.csv создан, размер:", len(df_big), "строк")
+
+# 2. ОБРАБОТКА БОЛЬШОГО ФАЙЛА ПО ЧАСТЯМ
+print("\nОбрабатываю большой файл по частям...")
+total_revenue = 0
+city_revenue = {}
+chunk_size = 5000
+
+for chunk in pd.read_csv("sales_big.csv", chunksize=chunk_size):
+    chunk["сумма"] = chunk["количество"] * chunk["цена"]
+    total_revenue += chunk["сумма"].sum()
+    group = chunk.groupby("город")["сумма"].sum()
+    for city, revenue in group.items():
+        city_revenue[city] = city_revenue.get(city, 0) + revenue
+
+print(f"\n✅ Обработано {len(df_big)} строк")
+print(f"💰 Общая выручка: {total_revenue:.2f} руб.")
+
+# 3. ВЫВЕДЕМ ВЫРУЧКУ ПО ГОРОДАМ
+print("\n📊 Выручка по городам:")
+for city, revenue in city_revenue.items():
+    print(f"   {city}: {revenue:.2f} руб.")
+
+# 4. ПОСТРОИМ ГРАФИК
+print("\n📈 Строю график...")
+cities = list(city_revenue.keys())
+revenues = list(city_revenue.values())
+
+plt.figure(figsize=(10, 6))
+plt.bar(cities, revenues, color='skyblue')
+plt.title("Выручка по городам", fontsize=16, color='white')
+plt.xlabel("Город", fontsize=12, color='white')
+plt.ylabel("Выручка (руб)", fontsize=12, color='white')
+plt.xticks(rotation=45, color='white')
+plt.yticks(color='white')
+plt.grid(axis='y', alpha=0.3, color='gray')
+
+plt.savefig("vyruchka_po_gorodam.png", dpi=100, bbox_inches='tight')
+print("✅ График сохранён как vyruchka_po_gorodam.png")
+plt.show()
+
+# 5. СОХРАНЯЕМ РЕЗУЛЬТАТЫ
+result_df = pd.DataFrame(list(city_revenue.items()), columns=["Город", "Выручка"])
+result_df = result_df.sort_values("Выручка", ascending=False)
+result_df.to_csv("itog_vyruchka.csv", index=False)
+print("✅ Итоговая таблица сохранена как itog_vyruchka.csv")
+
+# 6. СКАЧИВАЕМ ФАЙЛЫ
+print("\n📥 Скачиваю файлы...")
+files.download("itog_vyruchka.csv")
+files.download("vyruchka_po_gorodam.png")
+
+print("\n🎉 ГОТОВО!")
+print("📁 У тебя на компьютере теперь:")
+print("   - itog_vyruchka.csv (таблица с выручкой)")
+print("   - vyruchka_po_gorodam.png (график)")
