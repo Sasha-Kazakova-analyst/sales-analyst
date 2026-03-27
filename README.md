@@ -26,5 +26,5 @@
 
 ## 📁 Файлы
 - sales_analysis.py — код проекта
-- itog_vyruchka.csv — итоговая таблица
+- itog_vyruchka.parquet — итоговая таблица
 - vyruchka_po_gorodam.png — график
